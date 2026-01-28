@@ -54,6 +54,11 @@ jobs:
 
             cd ${{ secrets.EC2_APP_PATH }}
 
+            echo "Updating code..."
+            git fetch origin
+            git checkout main
+            git pull origin main
+
             echo "Creating frontend .env file..."
             cat > ./frontend/.env << 'ENVEOF'
             API_SECRET_KEY=${API_KEY}
@@ -69,11 +74,6 @@ jobs:
             ENVEOF
 
             chmod 600 ./frontend/.env ./backend/.env
-
-            echo "Updating code..."
-            git fetch origin
-            git checkout main
-            git pull origin main
 
             echo "Building and starting containers..."
             docker compose pull
