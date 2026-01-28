@@ -62,8 +62,7 @@ jobs:
 
             echo "Updating code..."
             git fetch origin
-            git checkout main
-            git pull origin main
+            git reset --hard origin/main
 
             echo "Creating frontend .env file..."
             cat > ./frontend/.env << ENVEOF
