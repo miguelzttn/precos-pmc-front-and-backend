@@ -1,0 +1,66 @@
+name: Deploy to EC2 (Main)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo (for metadata only)
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy on EC2
+        env:
+          API_BASE_URL: http://backend:8000/v1/frontend
+          API_KEY: ${{ secrets.BACKEND_API_KEY }}
+          BACKEND_AWS_ACCESS_KEY_ID: ${{ secrets.BACKEND_AWS_ACCESS_KEY_ID }}
+          BACKEND_AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKEND_AWS_SECRET_ACCESS_KEY }}
+          BACKEND_AWS_DEFAULT_REGION: ${{ secrets.BACKEND_AWS_DEFAULT_REGION }}
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << EOF
+            set -e
+
+            cd ${{ secrets.EC2_APP_PATH }}
+
+            echo "Creating frontend .env file..."
+            cat > ./frontend/.env << 'ENVEOF'
+            API_SECRET_KEY=${API_KEY}
+            API_BASE_URL=${API_BASE_URL}
+            ENVEOF
+
+            echo "Creating backend .env file..."
+            cat > ./backend/.env << 'ENVEOF'
+            API_SECRET_KEY=${API_KEY}
+            AWS_ACCESS_KEY_ID=${BACKEND_AWS_ACCESS_KEY_ID}
+            AWS_SECRET_ACCESS_KEY=${BACKEND_AWS_SECRET_ACCESS_KEY}
+            AWS_DEFAULT_REGION=${BACKEND_AWS_DEFAULT_REGION}
+            ENVEOF
+
+            chmod 600 ./frontend/.env
+            chmod 600 ./backend/.env
+
+            echo "Pulling latest main branch..."
+            git fetch origin
+            git checkout main
+            git pull origin main
+
+            echo "Building and starting containers..."
+            docker-compose pull
+            docker-compose up -d --build
+
+            echo "Verifying nginx is running..."
+            docker ps | grep precos-pmc-nginx
+
+            echo "Deployment complete."
+          EOF

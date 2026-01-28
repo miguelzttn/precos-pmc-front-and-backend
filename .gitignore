@@ -1,0 +1,48 @@
+# Bytecode Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Diretórios de cache específicos (reduz redundância)
+**/__pycache__/
+
+# Arquivos de ambiente
+.env
+
+# Bases de dados em duckdb
+*.duckdb
+
+# Cache do backend
+**/backend/cache/**
+
+# Arquivos temporários e de configuração
+*.log
+*.bak
+*.tmp
+*.swp
+
+# Arquivos de dados
+*.json
+*.csv
+*.xlsx
+
+# Configurações locais de IDE
+.vscode/
+.idea/
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos de builds e containers
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+.env/
+
+# Docker
+*.pid
+docker-compose.override.yml

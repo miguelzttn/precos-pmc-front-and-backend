@@ -1,0 +1,27 @@
+[theme]
+
+# Como o fundo escolhido é escuro, herdamos do tema dark para melhores ajustes automáticos
+base = "dark"
+
+# Primary accent color (CMYK 40, 0, 100, 0)
+primaryColor = "#99FF00"
+
+# Background color of the app (CMYK 90, 40, 50, 30)
+backgroundColor = "#1C6B59"
+
+# Background color used for most interactive widgets (levemente mais claro que o fundo)
+secondaryBackgroundColor = "#267D69"
+
+# Color used for almost all text (Invertido para claro)
+textColor = "#FAFAFA"
+
+# Font family
+font = "sans-serif"
+
+# Ajuste fino para bordas para combinar com o novo fundo
+borderColor = "#3E8B7A"
+
+[client] 
+
+# Esconde barra de navegacao
+showSidebarNavigation = false

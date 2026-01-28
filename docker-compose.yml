@@ -1,0 +1,56 @@
+
+services:
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: precos-pmc-nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
+    networks:
+      - precos-pmc-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: precos-pmc-backend
+    expose:
+      - "8000"
+    volumes:
+      - ./backend:/app
+      - ./backend/cache:/app/cache
+      - ./backend/gold.duckdb:/app/gold.duckdb
+    env_file:
+      - ./backend/.env
+    restart: unless-stopped
+    networks:
+      - precos-pmc-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: precos-pmc-frontend
+    expose:
+      - "8501"
+    volumes:
+      - ./frontend:/app
+    env_file:
+      - ./frontend/.env
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - precos-pmc-network
+    environment:
+      - API_BASE_URL=http://backend:8000/v1/frontend
+
+networks:
+  precos-pmc-network:
+    driver: bridge
