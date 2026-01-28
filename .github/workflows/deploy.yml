@@ -56,36 +56,36 @@ jobs:
              BACKEND_AWS_SECRET_ACCESS_KEY='${BACKEND_AWS_SECRET_ACCESS_KEY}' \
              BACKEND_AWS_DEFAULT_REGION='${BACKEND_AWS_DEFAULT_REGION}' \
              bash -s" << 'EOF'
-set -e
+          set -e
 
-cd "${{ secrets.EC2_APP_PATH }}"
+          cd "${{ secrets.EC2_APP_PATH }}"
 
-echo "Updating code..."
-git fetch origin
-git reset --hard origin/main
+          echo "Updating code..."
+          git fetch origin
+          git reset --hard origin/main
 
-echo "Creating frontend .env file..."
-cat > ./frontend/.env <<'ENVEOF'
-API_SECRET_KEY=${API_KEY}
-API_BASE_URL=${API_BASE_URL}
-ENVEOF
+          echo "Creating frontend .env file..."
+          cat > ./frontend/.env <<'ENVEOF'
+          API_SECRET_KEY=${API_KEY}
+          API_BASE_URL=${API_BASE_URL}
+          ENVEOF
 
-echo "Creating backend .env file..."
-cat > ./backend/.env <<'ENVEOF'
-API_SECRET_KEY=${API_KEY}
-AWS_ACCESS_KEY_ID=${BACKEND_AWS_ACCESS_KEY_ID}
-AWS_SECRET_ACCESS_KEY=${BACKEND_AWS_SECRET_ACCESS_KEY}
-AWS_DEFAULT_REGION=${BACKEND_AWS_DEFAULT_REGION}
-ENVEOF
+          echo "Creating backend .env file..."
+          cat > ./backend/.env <<'ENVEOF'
+          API_SECRET_KEY=${API_KEY}
+          AWS_ACCESS_KEY_ID=${BACKEND_AWS_ACCESS_KEY_ID}
+          AWS_SECRET_ACCESS_KEY=${BACKEND_AWS_SECRET_ACCESS_KEY}
+          AWS_DEFAULT_REGION=${BACKEND_AWS_DEFAULT_REGION}
+          ENVEOF
 
-chmod 600 ./frontend/.env ./backend/.env
+          chmod 600 ./frontend/.env ./backend/.env
 
-echo "Building and starting containers..."
-docker compose pull
-docker compose up -d --build
+          echo "Building and starting containers..."
+          docker compose pull
+          docker compose up -d --build
 
-echo "Verifying nginx container..."
-docker ps | grep precos-pmc-nginx
+          echo "Verifying nginx container..."
+          docker ps | grep precos-pmc-nginx
 
-echo "Deployment complete."
-EOF
+          echo "Deployment complete."
+          EOF
