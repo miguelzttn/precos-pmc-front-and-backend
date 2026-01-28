@@ -49,7 +49,13 @@ jobs:
         run: |
           set -e
 
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+            "API_KEY='${API_KEY}' \
+             API_BASE_URL='${API_BASE_URL}' \
+             BACKEND_AWS_ACCESS_KEY_ID='${BACKEND_AWS_ACCESS_KEY_ID}' \
+             BACKEND_AWS_SECRET_ACCESS_KEY='${BACKEND_AWS_SECRET_ACCESS_KEY}' \
+             BACKEND_AWS_DEFAULT_REGION='${BACKEND_AWS_DEFAULT_REGION}' \
+             bash -s" << 'EOF'
             set -e
 
             cd ${{ secrets.EC2_APP_PATH }}
@@ -60,17 +66,17 @@ jobs:
             git pull origin main
 
             echo "Creating frontend .env file..."
-            cat > ./frontend/.env << 'ENVEOF'
-            API_SECRET_KEY=${API_KEY}
-            API_BASE_URL=${API_BASE_URL}
+            cat > ./frontend/.env << ENVEOF
+            API_SECRET_KEY=$API_KEY
+            API_BASE_URL=$API_BASE_URL
             ENVEOF
 
             echo "Creating backend .env file..."
-            cat > ./backend/.env << 'ENVEOF'
-            API_SECRET_KEY=${API_KEY}
-            AWS_ACCESS_KEY_ID=${BACKEND_AWS_ACCESS_KEY_ID}
-            AWS_SECRET_ACCESS_KEY=${BACKEND_AWS_SECRET_ACCESS_KEY}
-            AWS_DEFAULT_REGION=${BACKEND_AWS_DEFAULT_REGION}
+            cat > ./backend/.env << ENVEOF
+            API_SECRET_KEY=$API_KEY
+            AWS_ACCESS_KEY_ID=$BACKEND_AWS_ACCESS_KEY_ID
+            AWS_SECRET_ACCESS_KEY=$BACKEND_AWS_SECRET_ACCESS_KEY
+            AWS_DEFAULT_REGION=$BACKEND_AWS_DEFAULT_REGION
             ENVEOF
 
             chmod 600 ./frontend/.env ./backend/.env
