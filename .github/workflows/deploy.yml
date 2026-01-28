@@ -81,8 +81,8 @@ jobs:
           chmod 600 ./frontend/.env ./backend/.env
 
           echo "Building and starting containers..."
-          docker-compose pull
-          docker-compose up -d --build
+          docker compose pull
+          docker compose up -d --build
 
           echo "Verifying nginx container..."
           docker ps | grep precos-pmc-nginx
