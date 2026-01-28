@@ -82,7 +82,7 @@ jobs:
 
           echo "Building and starting containers..."
           docker compose pull
-          docker compose up -d --build
+          docker compose up -d --build --force-recreate
 
           echo "Verifying nginx container..."
           docker ps | grep precos-pmc-nginx
