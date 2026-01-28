@@ -10,7 +10,7 @@ __pycache__/
 .env
 
 # Bases de dados em duckdb
-*.duckdb
+#*.duckdb
 
 # Cache do backend
 **/backend/cache/**
