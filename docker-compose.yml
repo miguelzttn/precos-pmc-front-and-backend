@@ -11,8 +11,8 @@ services:
       - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./certs/cloudflare.pem:/etc/ssl/certs/cloudflare.pem:ro
-      - ./certs/cloudflare.key:/etc/ssl/private/cloudflare.key:ro
+      - /etc/ssl/certs/cloudflare.pem:/etc/ssl/certs/cloudflare.pem:ro
+      - /etc/ssl/private/cloudflare.key:/etc/ssl/private/cloudflare.key:ro
     depends_on:
       - backend
       - frontend
