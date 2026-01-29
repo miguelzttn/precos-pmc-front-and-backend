@@ -25,3 +25,16 @@ borderColor = "#3E8B7A"
 
 # Esconde barra de navegacao
 showSidebarNavigation = false
+
+# Remove a parte de rerun
+toolbarMode = "minimal"
+
+[ui]
+# Esconde a "Rerun"
+hideTopBar = true
+
+[server]
+
+# Auto rerun
+runOnSave = true
+fileWatcherType = "auto"
