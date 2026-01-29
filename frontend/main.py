@@ -103,7 +103,8 @@ if is_initial_state:
     for i, ex in enumerate(exemplos):
 
         if cols[i].button(ex, use_container_width=True):
-            del st.session_state["produto_search_str"]
+            if "produto_search_str" in st.session_state:
+                del st.session_state["produto_search_str"]
             st.session_state["produto_search_str"] = ex
             st.rerun()
 
