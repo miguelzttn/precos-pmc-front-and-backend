@@ -57,36 +57,33 @@ O projeto foi desenhado para ser **simples de operar**, **eficiente em consultas
 
 ```mermaid
 flowchart TB
-    Internet((Usuário / Navegador))
+    User[Usuário / Navegador]
 
-    subgraph Edge["Borda / Edge"]
-        CF[Cloudflare<br/>SSL • CDN]
+    subgraph Edge
+        CF["Cloudflare\nSSL & CDN"]
     end
 
-    subgraph Infra["Infraestrutura Docker"]
-        NGINX[Nginx<br/>Reverse Proxy<br/>80 / 443]
+    subgraph Docker["Infraestrutura Docker"]
+        NGINX["Nginx\nReverse Proxy\nPorts 80 / 443"]
 
-        subgraph Apps["Aplicações"]
-            FE[Frontend<br/>Streamlit<br/>:8501]
-            BE[Backend<br/>FastAPI<br/>:8000]
+        subgraph Apps["Camada de Aplicação"]
+            FE["Frontend\nStreamlit\n:8501"]
+            BE["Backend\nFastAPI\n:8000"]
         end
 
         subgraph Data["Camada de Dados"]
-            DDB[DuckDB<br/>Analytical Engine]
-            PQ[Parquet Files<br/>Data Lake]
+            DDB["DuckDB\nAnalytical Engine"]
+            PQ["Parquet Files\nData Lake"]
         end
     end
 
-    Internet --> CF
+    User --> CF
     CF --> NGINX
-
-    NGINX -->|"/"| FE
-    NGINX -->|"/api"| BE
-
+    NGINX -->|/| FE
+    NGINX -->|/api| BE
     BE --> DDB
     DDB --> PQ
-
-    BE -.->|APScheduler<br/>Hourly Jobs| PQ
+    BE -.->|"APScheduler\nHourly Jobs"| PQ
 ```
 
 ## ✨ Principais Funcionalidades
