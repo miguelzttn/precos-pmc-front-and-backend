@@ -15,6 +15,7 @@ st.set_page_config(
 )
 
 apply_custom_style()
+api = APIClient()
 
 # ------------------------------------------------------------------------------
 # Placeholders
@@ -25,7 +26,6 @@ placeholder_hero_image = st.empty()
 placeholder_hero_title = st.empty()
 placeholder_hero_subtitle = st.empty()
 
-api = APIClient()
 
 # --- FILTERS ---
 
@@ -35,7 +35,6 @@ with st.container():
         placeholder_filters_search_input = st.empty()
     with c2:
         placeholder_filters_recent_toggle = st.empty()
-
 
 placeholder_hero_image.image(
     "https://cliqueeconomia.curitiba.pr.gov.br/img/logo_prefeitura_branco.png",
@@ -107,6 +106,14 @@ if is_initial_state:
                 del st.session_state["produto_search_str"]
             st.session_state["produto_search_str"] = ex
             st.rerun()
+    
+    # - disclaimer
+    st.warning(
+        "Este projeto é independente e não possui vínculo com a Prefeitura de Curitiba. \n\n"
+        "Os dados apresentados são coletados de forma automatizada e podem conter imprecisões. \n\n"
+        "Para mais informações, visite o [repositório no GitHub](https://github.com/miguelzttn/precos-pmc-front-and-backend)",
+        icon="⚠️",
+    )
 
     st.stop()
 
@@ -155,3 +162,5 @@ else:
                 st.rerun()
 
             break
+
+
