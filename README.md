@@ -60,20 +60,20 @@ flowchart TB
     User[Usuário / Navegador]
 
     subgraph Edge
-        CF["Cloudflare\nSSL & CDN"]
+        CF["Cloudflare SSL & CDN"]
     end
 
     subgraph Docker["Infraestrutura Docker"]
-        NGINX["Nginx\nReverse Proxy\nPorts 80 / 443"]
+        NGINX["Nginx Reverse Proxy Ports 80 / 443"]
 
         subgraph Apps["Camada de Aplicação"]
-            FE["Frontend\nStreamlit\n:8501"]
-            BE["Backend\nFastAPI\n:8000"]
+            FE["Frontend Streamlit :8501"]
+            BE["Backend FastAPI :8000"]
         end
 
         subgraph Data["Camada de Dados"]
-            DDB["DuckDB\nAnalytical Engine"]
-            PQ["Parquet Files\nData Lake"]
+            DDB["DuckDB Analytical Engine"]
+            PQ["Parquet Files Data Lake"]
         end
     end
 
@@ -83,7 +83,7 @@ flowchart TB
     NGINX -->|/api| BE
     BE --> DDB
     DDB --> PQ
-    BE -.->|"APScheduler\nHourly Jobs"| PQ
+    BE -.->|"APScheduler Hourly Jobs"| PQ
 ```
 
 ## ✨ Principais Funcionalidades
