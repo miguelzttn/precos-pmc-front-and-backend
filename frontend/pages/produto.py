@@ -308,8 +308,14 @@ with st.spinner("Atualizando painel..."):
     )
 
     # Métricas
+    dt_menor_preco = metricas.get("dt_menor_preco", "")
+    if isinstance(dt_menor_preco, str) and dt_menor_preco:
+        dt_menor_preco = datetime.strptime(dt_menor_preco, "%Y-%m-%d").strftime(
+            "%d/%m/%Y"
+        )
+
     placeholder_highlight_menor_preco.metric(
-        "Menor Preço " + metricas.get("dt_menor_preco", ""),
+        "Menor Preço " + dt_menor_preco,
         f"R$ {metricas.get('vl_menor_preco_periodo', 0):,.2f}".replace(".", ","),
         delta=(
             f"R$ {metricas.get('vl_variacao_preco_periodo', 0):,.2f} ({metricas.get('pc_variacao_preco_periodo', 0):.2f}%)"
