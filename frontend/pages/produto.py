@@ -262,6 +262,12 @@ with st.spinner("Carregando dados do produto..."):
 
 with st.spinner("Atualizando painel..."):
 
+    # Atualiza pagina
+    st.set_page_config(
+        page_title=f"{produto.get('nm_produto', '').strip()} - DETALHE - CURITIBA PREÇOS ", 
+        layout="wide"
+    )
+
     # Informacoes do produto
     placeholder_title.title(f"{produto.get('nm_produto', '').strip()}")
     placeholder_title_marca.badge(f"{produto.get('nm_marca')}", color="yellow")
