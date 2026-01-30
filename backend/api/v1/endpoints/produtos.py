@@ -108,9 +108,9 @@ async def get_produto(
                 FROM precos_filtrados
             ),
             preco_final_periodo AS (
-                SELECT LAST(vl_preco_minimo) AS vl_preco_final_periodo
+                SELECT vl_preco_minimo AS vl_preco_final_periodo
                 FROM precos_filtrados
-                ORDER BY dt_referencia DESC
+                QUALIFY ROW_NUMBER() OVER (ORDER BY dt_referencia DESC) = 1
             ),
             preco_estimado_periodo AS (
                 SELECT
