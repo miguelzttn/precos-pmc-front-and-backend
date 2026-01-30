@@ -170,7 +170,7 @@ async def get_produto(
     query_enderecos_mais_baratos = f"""
         WITH precos AS ({query_comparativo})
         SELECT
-            '- ** R$ ' || p.vl_preco_atacado || '** - ' || p.nm_rede ||
+            '- **R$ ' || p.vl_preco_atacado || ' - ' || p.nm_rede ||
             ' - ' || p.nm_bairro || '**: ' ||
             '[' || p.nm_rede || ' (' || p.nm_bairro || ')]' ||
             '(https://www.google.com/maps/search/?api=1&query=' ||
