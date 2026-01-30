@@ -49,12 +49,15 @@ async def buscar_produtos(
             nm_tipo,
             nm_marca,
             dt_ultima_atualizacao,
+            vl_ultimo_preco_mais_baixo,
             nm_descricao_original,
-            'https://cdn-icons-png.flaticon.com/512/1178/1178479.png' AS nm_url_imagem
+            nm_url_thumbnail,
+            COALESCE(nm_url_thumbnail, 'https://cdn-icons-png.flaticon.com/512/1178/1178479.png') AS nm_url_imagem,
+            COALESCE(CONCAT('[', nm_source_name, '](', nm_source_link, ')'), '') AS nm_imagem_creditos_markdown
         FROM d_produtos
         WHERE nm_descricao_original LIKE ?  
         {recent_only_clause}
-        ORDER BY nm_produto
+        ORDER BY nm_url_thumbnail ASC
         LIMIT ? OFFSET ?
     """
 
@@ -78,6 +81,8 @@ async def buscar_produtos(
             nm_url_imagem=row['nm_url_imagem'],
             dt_ultima_atualizacao=row['dt_ultima_atualizacao'],
             nm_descricao_original=row['nm_descricao_original'],
+            nm_imagem_creditos_markdown=row['nm_imagem_creditos_markdown'],
+            vl_ultimo_preco_mais_baixo=row['vl_ultimo_preco_mais_baixo'],
         )
         for _, row in produtos_df.iterrows()
     ]

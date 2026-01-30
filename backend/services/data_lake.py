@@ -1,5 +1,7 @@
+import os
 import re
 import sys
+import shutil
 import unicodedata
 import subprocess
 import duckdb
@@ -35,6 +37,33 @@ def _s3_sync(source, destination):
     except FileNotFoundError:
         print("Error: 'aws' command not found. Ensure AWS CLI is installed and in your PATH.")
         sys.exit(1)
+
+
+def _clear_folder(folder_path: Path) -> None:
+    """
+    Deletes all files and subdirectories inside the given folder.
+    The folder itself is not deleted.
+    """
+    if not os.path.exists(folder_path):
+        print(f"Error: Path '{folder_path}' does not exist.")
+        return
+    
+    if not os.path.isdir(folder_path):
+        print(f"Error: '{folder_path}' is not a directory.")
+        return
+
+    for item in os.listdir(folder_path):
+        item_path = os.path.join(folder_path, item)
+        try:
+            if os.path.isfile(item_path) or os.path.islink(item_path):
+                os.unlink(item_path)  # Remove file or symbolic link
+            elif os.path.isdir(item_path):
+                shutil.rmtree(item_path)  # Remove directory and contents
+        except Exception as e:
+            print(f"Failed to delete '{item_path}': {e}")
+
+    print(f"All contents of '{folder_path}' have been deleted.")
+
 
 def _list_subfolders(folder_path: Path):
     """
@@ -82,7 +111,8 @@ def update_duck_db():
     local_data_path = Path('.') / 'cache' / 'gold_parquet'
     local_data_path.mkdir(parents=True, exist_ok=True)
 
-    _s3_sync(s3_bucket, str(local_data_path))
+    #_clear_folder(local_data_path)
+    #_s3_sync(s3_bucket, str(local_data_path))
 
     tables = _list_subfolders(local_data_path)
     for table_path in tables:

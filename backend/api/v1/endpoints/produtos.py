@@ -13,10 +13,10 @@ async def listar_bairros_disponiveis(cd_produto: int, dt_start: date, dt_end: da
     rede_filter = f" AND nm_rede = '{nm_rede}'" if nm_rede else ""
     query = f"""
         SELECT DISTINCT nm_bairro
-        FROM f_precos
+        FROM f_precos_completa
         WHERE nm_bairro IS NOT NULL
         AND cd_produto = ?
-        AND dt_ultima_atualizacao >= ? AND dt_ultima_atualizacao <= ?
+        AND dt_referencia >= ? AND dt_referencia <= ?
         {rede_filter}
         ORDER BY nm_bairro
     """
@@ -28,9 +28,9 @@ async def listar_redes_disponiveis(cd_produto: int, dt_start: date, dt_end: date
     bairro_filter = f" AND nm_bairro = '{nm_bairro}'" if nm_bairro else ""
     query = f"""
         SELECT DISTINCT nm_rede
-        FROM f_precos
+        FROM f_precos_completa
         WHERE cd_produto = ?
-        AND dt_ultima_atualizacao >= ? AND dt_ultima_atualizacao <= ? 
+        AND dt_referencia >= ? AND dt_referencia <= ? 
         {bairro_filter}
         ORDER BY nm_rede
     """
@@ -57,7 +57,8 @@ async def get_produto(
             nm_produto,
             nm_tipo,
             nm_marca,
-            'https://cdn-icons-png.flaticon.com/512/1178/1178479.png' AS nm_url_imagem
+            COALESCE(nm_url_thumbnail, 'https://cdn-icons-png.flaticon.com/512/1178/1178479.png') AS nm_url_imagem,
+            COALESCE(CONCAT('[', nm_source_name, '](', nm_source_link, ')'), '') AS nm_imagem_creditos_markdown
         FROM d_produtos
         WHERE cd_produto = ?
         LIMIT 1
@@ -68,17 +69,17 @@ async def get_produto(
 
     query_precos = f"""
         SELECT
-            dt_ultima_atualizacao,
+            dt_referencia,
             AVG(vl_preco_atacado) AS vl_preco_medio, 
             MIN(vl_preco_atacado) AS vl_preco_minimo, 
             MAX(vl_preco_atacado) AS vl_preco_maximo
-        FROM f_precos
-        WHERE dt_ultima_atualizacao >= ? AND dt_ultima_atualizacao <= ?
+        FROM f_precos_completa
+        WHERE dt_referencia >= ? AND dt_referencia <= ?
         AND cd_produto = ?
         {bairro_filter}
         {rede_filter}
-        GROUP BY dt_ultima_atualizacao
-        ORDER BY dt_ultima_atualizacao ASC
+        GROUP BY dt_referencia
+        ORDER BY dt_referencia ASC
     """
     
     precos = query_duck_db(
@@ -90,14 +91,14 @@ async def get_produto(
             precos_filtrados AS ({query_precos}),
             data_menor_preco AS (
                 SELECT 
-                    dt_ultima_atualizacao AS dt_menor_preco
+                    dt_referencia AS dt_menor_preco
                 FROM precos_filtrados
                 ORDER BY vl_preco_minimo ASC
                 LIMIT 1
             ),
             data_menor_preco_estimado AS (
                 SELECT 
-                    dt_ultima_atualizacao AS dt_menor_preco_estimado
+                    dt_referencia AS dt_menor_preco_estimado
                 FROM precos_filtrados
                 ORDER BY vl_preco_minimo ASC
                 LIMIT 1
@@ -155,9 +156,9 @@ async def get_produto(
             nm_bairro,
             CONCAT(nm_rede, ' (', nm_bairro, ')') AS nm_estabelecimento, 
             vl_preco_atacado,
-            dt_ultima_atualizacao
-        FROM f_precos
-        WHERE dt_ultima_atualizacao >= ? AND dt_ultima_atualizacao <= ?
+            dt_referencia
+        FROM f_precos_completa
+        WHERE dt_referencia >= ? AND dt_referencia <= ?
         AND cd_produto = ?
         {bairro_filter}
         {rede_filter}
@@ -177,8 +178,8 @@ async def get_produto(
                 e.nm_endereco_logradouro || ' ' || e.nm_endereco_numero
             ) ||
             ') *Atualizado:* ' ||
-            strftime(p.dt_ultima_atualizacao, '%d/%m/%Y') AS descricao
-        FROM precos p
+            strftime(p.dt_referencia, '%d/%m/%Y') AS descricao
+        FROM f_precos_completa p
         LEFT JOIN d_empresas e
             ON p.nm_rede = e.nm_rede
             AND p.nm_bairro = e.nm_bairro

@@ -23,6 +23,9 @@ class ProdutoResponse(BaseModel):
     nm_marca: str
     nm_descricao_original: str
     dt_ultima_atualizacao: date
+    vl_ultimo_preco_mais_baixo: Optional[float] = None
+    nm_url_imagem: str
+    nm_imagem_creditos_markdown: str
 
 class ProdutoDetails(BaseModel):
     cd_produto: int
@@ -30,7 +33,8 @@ class ProdutoDetails(BaseModel):
     nm_tipo: str
     nm_marca: str
     nm_url_imagem: str
-
+    nm_imagem_creditos_markdown: str
+    
     obj_metricas: dict
     obj_chart_trend: List[dict]
     obj_chart_comparativo: List[dict]
