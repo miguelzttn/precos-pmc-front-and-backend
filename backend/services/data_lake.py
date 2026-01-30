@@ -111,8 +111,8 @@ def update_duck_db():
     local_data_path = Path('.') / 'cache' / 'gold_parquet'
     local_data_path.mkdir(parents=True, exist_ok=True)
 
-    #_clear_folder(local_data_path)
-    #_s3_sync(s3_bucket, str(local_data_path))
+    _clear_folder(local_data_path)
+    _s3_sync(s3_bucket, str(local_data_path))
 
     tables = _list_subfolders(local_data_path)
     for table_path in tables:
