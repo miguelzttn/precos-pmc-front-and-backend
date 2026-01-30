@@ -180,10 +180,10 @@ async def get_produto(
             ') *Atualizado:* ' ||
             strftime(p.dt_referencia, '%d/%m/%Y') AS descricao
         FROM f_precos_completa p
-        WHERE p.vl_preco_atacado > 0
         LEFT JOIN d_empresas e
             ON p.nm_rede = e.nm_rede
             AND p.nm_bairro = e.nm_bairro
+        WHERE p.vl_preco_atacado > 0
         QUALIFY 
             ROW_NUMBER() OVER (PARTITION BY p.nm_rede, p.nm_bairro ORDER BY p.vl_preco_atacado ASC) == 1
         ORDER BY p.vl_preco_atacado ASC
