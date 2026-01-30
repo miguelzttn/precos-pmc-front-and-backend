@@ -80,6 +80,10 @@ jobs:
 
           chmod 600 ./frontend/.env ./backend/.env
 
+          echo "Deleting old containers..."
+          docker compose down --volumes --remove-orphans
+          docker system prune -f
+
           echo "Building and starting containers..."
           docker compose pull
           docker compose up -d --build --force-recreate

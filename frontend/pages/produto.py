@@ -78,6 +78,7 @@ placeholder_main_divider = st.empty()
 
 # --- COMPARATIVO POR ESTABELECIMENTO ---
 placeholder_comparativo_subheader = st.empty()
+placeholder_comparativo_explanation = st.empty()
 placeholder_comparativo_chart = st.empty()
 placeholder_comparativo_divider = st.empty()
 
@@ -88,6 +89,10 @@ placeholder_enderecos_bullet_2 = st.empty()
 placeholder_enderecos_bullet_3 = st.empty()
 placeholder_enderecos_bullet_4 = st.empty()
 placeholder_enderecos_bullet_5 = st.empty()
+
+placeholder_end_divider = st.empty()
+placeholder_end_image_credits = st.empty()
+placeholder_end_disclaimer = st.empty()
 
 # ------------------------------------------------------------------------------
 # Dependem do Cache
@@ -142,7 +147,13 @@ if placeholder_title_button_return.button("← Voltar", width=100):
         del st.session_state["dt_produto_end"]
     st.switch_page("main.py")
 
-placeholder_comparativo_subheader.subheader("🟢 Comparativo por Estabelecimento")
+placeholder_comparativo_subheader.subheader("⚖️ Comparativo por Estabelecimento")
+placeholder_comparativo_explanation.markdown(
+    "Este gráfico mostra a variação de preços por estabelecimento."
+    "Quanto mais à direita, mais caro.\n\n"
+    "A idéia é identificar quais estabelecimentos estão oferecendo os melhores preços para o produto selecionado."
+)
+
 
 placeholder_enderecos_subheader.subheader(
     "📍 Endereço dos estabelecimentos mais em conta"
@@ -151,6 +162,7 @@ placeholder_enderecos_subheader.subheader(
 placeholder_hero_divider.divider()
 placeholder_main_divider.divider()
 placeholder_comparativo_divider.divider()
+placeholder_end_divider.divider()
 
 # ------------------------------------------------------------------------------
 # Busca de Dados
@@ -237,7 +249,7 @@ with st.spinner("Carregando dados do produto..."):
 
     df_precos = pl.from_dicts(precos)
     df_melted = df_precos.to_pandas().melt(
-        id_vars=["dt_ultima_atualizacao"],
+        id_vars=["dt_referencia"],
         value_vars=["vl_preco_minimo", "vl_preco_maximo", "vl_preco_medio"],
         var_name="Tipo",
         value_name="Preço",
@@ -307,29 +319,34 @@ with st.spinner("Atualizando painel..."):
     )
 
     placeholder_highlight_estimado_atual.metric(
-        "✨ " + metricas.get("dt_menor_preco_estimado", ""),
-        f":yellow[R$ {metricas.get('vl_preco_estimado_periodo', 0):,.2f}]".replace(
-            ".", ","
-        ),
-        delta=(
-            f"R$ {metricas.get('vl_variacao_preco_estimado_periodo', 0):,.2f} ({metricas.get('pc_variacao_preco_estimado_periodo', 0):.2f}%)"
-            if metricas.get("pc_variacao_preco_estimado_periodo", 0) > 0
-            else "Melhor preço!"
-        ),
+        "✨ Preço da próxima semana",
+        #"✨ " + metricas.get("dt_menor_preco_estimado", ""),
+        # f":yellow[R$ {metricas.get('vl_preco_estimado_periodo', 0):,.2f}]".replace(
+        #     ".", ","
+        # ),
+        ":yellow[Em breve!]",
+        # delta=(
+        #     f"R$ {metricas.get('vl_variacao_preco_estimado_periodo', 0):,.2f} ({metricas.get('pc_variacao_preco_estimado_periodo', 0):.2f}%)"
+        #     if metricas.get("pc_variacao_preco_estimado_periodo", 0) > 0
+        #     else "Melhor preço!"
+        # ),
+        delta="Vai subir!",
         delta_color="inverse",
-        help="Projeção realizada",
+        help="Ainda estamos desenvolvendo as projeçoes de preços. Em breve esta métrica estará disponível.",
     )
 
     placeholder_highlight_estimado_minimo.metric(
         "✨ Mínimo estimado",
-        f":yellow[R$ {metricas.get('vl_menor_preco_estimado_periodo', 0):,.2f}]".replace(
-            ".", ","
-        ),
-        help="Projeção realizada",
+        #f":yellow[R$ {metricas.get('vl_menor_preco_estimado_periodo', 0):,.2f}]".replace(
+        #    ".", ","
+        #),
+        ":yellow[Em breve!]",
+        help="Ainda estamos desenvolvendo as projeçoes de preços. Em breve esta métrica estará disponível.",
     )
 
     # Imagem do produto
     img_url = produto.get("nm_url_imagem")
+    img_source = produto.get("nm_imagem_creditos_markdown", "")
     placeholder_highlight_product_image.markdown(
         f"""
         <div class="product-img-highlight">
@@ -339,26 +356,42 @@ with st.spinner("Atualizando painel..."):
         unsafe_allow_html=True,
     )
 
+    placeholder_end_image_credits.markdown(f"Créditos imagem: {img_source or ''}")
+
     # Gráfico de variação de preço
-    chart = (
+    line = (
         alt.Chart(df_melted)
         .mark_line(interpolate="monotone")
         .encode(
-            x=alt.X("dt_ultima_atualizacao:T", title="Data"),
+            x=alt.X("dt_referencia:T", title="Data"),
             y=alt.Y("Preço:Q", title="Preço (R$)", scale=alt.Scale(zero=False)),
             color=alt.Color(
                 "Tipo:N", scale=alt.Scale(range=["#FFFFFF", "#FFE600", "#99FF00"])
             ),
             strokeDash=alt.condition(
-                alt.datum.Tipo == "Média",
+                alt.datum.Tipo == "vl_preco_medio",
                 alt.value([0, 0]),
                 alt.value([4, 4]),
             ),
-            tooltip=["dt_ultima_atualizacao", "Tipo", "Preço"],
+            tooltip=["dt_referencia", "Tipo", "Preço"],
         )
-        .properties(height=400)
-        .interactive()
     )
+
+    points = (
+        alt.Chart(df_melted)
+        .mark_point(size=60, filled=True)
+        .encode(
+            x="dt_referencia:T",
+            y="Preço:Q",
+            color=alt.Color(
+                "Tipo:N", scale=alt.Scale(range=["#FFFFFF", "#FFE600", "#99FF00"])
+            ),
+            tooltip=["dt_referencia:T", "Tipo", "Preço:Q"],
+        )
+    )
+
+    chart = (line + points).properties(height=400).interactive()
+
     placeholder_chart.altair_chart(chart, width="stretch")
 
     # Gráfico comparativo por estabelecimento
@@ -373,6 +406,7 @@ with st.spinner("Atualizando painel..."):
                     "vl_preco_atacado:Q",
                     title="Preço Atacado (R$)",
                     scale=alt.Scale(zero=False),
+                    axis=alt.Axis(orient="top")
                 ),
                 y=alt.Y(
                     "nm_estabelecimento:N",
@@ -386,7 +420,7 @@ with st.spinner("Atualizando painel..."):
                     "nm_rede",
                     "nm_bairro",
                     "vl_preco_atacado",
-                    "dt_ultima_atualizacao",
+                    "dt_referencia",
                 ],
             )
             .add_params(selection)
@@ -411,3 +445,11 @@ with st.spinner("Atualizando painel..."):
             placeholder_enderecos_bullet_4.markdown(endereco.get("descricao", ""))
         elif i == 4:
             placeholder_enderecos_bullet_5.markdown(endereco.get("descricao", ""))
+
+placeholder_end_disclaimer.warning(
+    "Este projeto é independente e não possui vínculo com a Prefeitura de Curitiba. \n\n"
+    "Os dados apresentados são coletados de forma automatizada e podem conter imprecisões. \n\n"
+    "Não nos responsabilizamos por eventuais erros ou omissões. \n\n"
+    "Para mais informações, visite o [repositório no GitHub](https://github.com/miguelzttn/precos-pmc-front-and-backend)",
+    icon="⚠️",
+)

@@ -111,6 +111,7 @@ if is_initial_state:
     st.warning(
         "Este projeto é independente e não possui vínculo com a Prefeitura de Curitiba. \n\n"
         "Os dados apresentados são coletados de forma automatizada e podem conter imprecisões. \n\n"
+        "Não nos responsabilizamos por eventuais erros ou omissões. \n\n"
         "Para mais informações, visite o [repositório no GitHub](https://github.com/miguelzttn/precos-pmc-front-and-backend)",
         icon="⚠️",
     )
@@ -143,6 +144,7 @@ else:
                 descricao=item.get("nm_descricao_original"),
                 marca=item.get("nm_marca", "N/A"),
                 ultima_atualizacao=item.get("dt_ultima_atualizacao"),
+                vl_ultimo_preco_mais_baixo=item.get("vl_ultimo_preco_mais_baixo"),
             )
 
         if i >= st.session_state.get("limit", MAX_RESULTS_PER_PAGE) - 1:

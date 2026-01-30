@@ -10,6 +10,7 @@ def display_item_card(
     marca: str,
     ultima_atualizacao: str,
     produto_search_str: str,
+    vl_ultimo_preco_mais_baixo: float,
 ):
     col_img, col_txt, col_btn = st.columns([1, 3, 1.2])
 
@@ -18,9 +19,17 @@ def display_item_card(
 
     with col_txt:
         st.markdown(f"### {descricao.title()}")
-        st.markdown(f"**Marca:** {marca.title()}")
-        st.caption(f"Atualizado em: {ultima_atualizacao}")
 
+        col_1, col_2 = st.columns([1, 2])
+
+        with col_1:
+            st.markdown(f"**Marca:** {marca.title()}")
+        
+        with col_2:
+            st.badge(f"R$ {vl_ultimo_preco_mais_baixo:.2f}", color="green")
+
+        st.caption(f"Atualizado em: {ultima_atualizacao}")
+    
     with col_btn:
         btn_key = f"btn_{cd_produto}_{ultima_atualizacao}_card_button"
 
