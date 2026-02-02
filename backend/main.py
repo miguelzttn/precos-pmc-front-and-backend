@@ -17,10 +17,8 @@ def init_data():
     scheduler = BackgroundScheduler()
 
     cron = {
-        'hour': '*/1', 
-    #    'minute': '0',
-         #'minute': '*/1',
-    #    'second': '0'
+        'hour': '17', 
+        'minute': '0',
     }
 
     scheduler.add_job(update_duck_db, 'cron', **cron)
